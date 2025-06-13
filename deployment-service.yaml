@@ -22,6 +22,18 @@ spec:
 
 ---
 
+# apiVersion: v1 # Kubernetes API version
+# kind: Service # Kubernetes resource kind we are creating
+# metadata: # Metadata of the resource kind we are creating
+#   name: boardgame-ssvc
+# spec:
+#   selector:
+#     app: boardgame
+#   ports:
+#     - protocol: "TCP"
+#       port: 80
+#       targetPort: 8080 
+#   type: LoadBalancer # type of the service.
 apiVersion: v1 # Kubernetes API version
 kind: Service # Kubernetes resource kind we are creating
 metadata: # Metadata of the resource kind we are creating
@@ -33,4 +45,4 @@ spec:
     - protocol: "TCP"
       port: 80
       targetPort: 8080 
-  type: LoadBalancer # type of the service.
+  type: LoadBalancer
