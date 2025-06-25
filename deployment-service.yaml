@@ -48,3 +48,29 @@ spec:
       port: 80
       targetPort: 8080 
   type: NodePort
+
+
+
+# make sure that u have install ingressclaass alb
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: game-2048
+  name: ingress-2048
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: boardgame-ssvc
+              port:
+                number: 80
+
