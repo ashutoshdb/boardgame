@@ -24,6 +24,10 @@ jobs:
           java-version: '21'
           cache: maven
 
+      - name: Verify Coverity URL
+        run: |
+          echo "COVERITY_URL='${{ vars.COVERITY_URL }}'"
+
       - name: Coverity Scan
         uses: blackduck-inc/black-duck-security-scan@v2
         with:
@@ -34,8 +38,8 @@ jobs:
           coverity_policy_view: ${{ github.event_name != 'pull_request' && 'Outstanding Issues' || '' }}
           coverity_prComment_enabled: true
 
+          # coverity_build_command: mvn -B clean
           coverity_build_command: mvn -B -DskipTests package
-          coverity_clean_command: mvn -B clean
 
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          include_diagnostics: false
+          include_diagnostics: true
