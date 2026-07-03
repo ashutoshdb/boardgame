@@ -1,34 +1,34 @@
-name: CI Coverity Scan
-
+# example workflow for Coverity scans using the Black Duck Security Scan Action
+# https://github.com/marketplace/actions/black-duck-security-scan
+name: coverity-ss-action
 on:
   push:
-    branches:
-      - main
-
+    branches: [ main, master, develop, stage, release ]
   pull_request:
-    branches:
-      - main
-
+    branches: [ main, master, develop, stage, release ]
+  workflow_dispatch:
 jobs:
   coverity:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      pull-requests: write
-      security-events: write
-      actions: read
-
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-
-      - name: Run Coverity Scan
-        uses: blackduck-inc/black-duck-security-scan@v2
-        with:
-          coverity_url: ${{ vars.COVERITY_URL }}
-          coverity_user: ${{ secrets.COVERITY_USER }}
-          coverity_passphrase: ${{ secrets.COVERITY_PASSPHRASE }}
-
-          scan_mode: INTELLIGENT
-          coverity_scan_full: true
+    - name: Checkout Source
+      uses: actions/checkout@v6
+    - name: Setup Java JDK
+      uses: actions/setup-java@v5
+      with:
+        java-version: 25
+        distribution: temurin
+        cache: maven
+    - name: Coverity Scan
+      uses: blackduck-inc/black-duck-security-scan@v2
+      with:
+        coverity_url: ${{ vars.COVERITY_URL }}
+        coverity_user: ${{ secrets.COV_USER }}
+        coverity_passphrase: ${{ secrets.COVERITY_PASSPHRASE }}
+        coverity_policy_view: ${{ github.event_name != 'pull_request' && 'Outstanding Issues' || '' }}
+        coverity_prComment_enabled: true
+        coverity_build_command: mvn -B -DskipTests package
+        coverity_clean_command: mvn -B clean
+        # coverity_local: true
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        include_diagnostics: false
