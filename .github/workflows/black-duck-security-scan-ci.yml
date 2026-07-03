@@ -2,16 +2,32 @@ name: coverity-ss-action
 
 on:
   push:
-    branches: [ main, master, develop, stage, release ]
+    branches:
+      - main
+      - master
+      - develop
+      - stage
+      - release
 
   pull_request:
-    branches: [ main, master, develop, stage, release ]
+    branches:
+      - main
+      - master
+      - develop
+      - stage
+      - release
 
   workflow_dispatch:
 
 jobs:
   coverity:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+      security-events: write
+      actions: read
 
     steps:
       - name: Checkout Source
@@ -24,22 +40,22 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Verify Coverity URL
+      - name: Verify Configuration
         run: |
-          echo "COVERITY_URL='${{ vars.COVERITY_URL }}'"
+          echo "Coverity URL: ${{ vars.COVERITY_URL }}"
 
       - name: Coverity Scan
         uses: blackduck-inc/black-duck-security-scan@v2
         with:
           coverity_url: ${{ vars.COVERITY_URL }}
           coverity_user: ${{ secrets.COV_USER }}
-          coverity_passphrase: ${{ secrets.COVERITY_PASSPHRASE }}
+          coverity_passphrase: ${{ secrets.COV_PASSPHRASE }}
 
-          coverity_policy_view: ${{ github.event_name != 'pull_request' && 'Outstanding Issues' || '' }}
-          coverity_prComment_enabled: true
-
-          # coverity_build_command: mvn -B clean
           coverity_build_command: mvn -B -DskipTests package
+          coverity_clean_command: mvn -B clean
+
+          coverity_prComment_enabled: true
+          coverity_policy_view: ${{ github.event_name != 'pull_request' && 'Outstanding Issues' || '' }}
 
           github_token: ${{ secrets.GITHUB_TOKEN }}
           include_diagnostics: true
